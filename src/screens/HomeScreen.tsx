@@ -10,8 +10,9 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ScheduleDialog, {ScheduleSettings} from '../components/ScheduleDialog';
-import {DAYS} from '../constants/days';
+import {DAYS, DayType} from '../constants/days';
 import { wateringService } from '../services/wateringService';
+import AboutModal from '../components/AboutModal';
 
 const HomeScreen = () => {
   const [isWatering, setIsWatering] = useState(false);
@@ -21,6 +22,7 @@ const HomeScreen = () => {
     null,
   );
   const [manualControl, setManualControl] = useState(false);
+  const [showAboutModal, setShowAboutModal] = useState(false);
 
   useEffect(() => {
     const checkSchedule = async () => {
@@ -68,6 +70,15 @@ const HomeScreen = () => {
     return () => clearInterval(interval);
   }, [scheduleEnabled, currentSchedule, manualControl]);
 
+  const formatScheduleDays = (days: DayType[]) => {
+    if (days.length === 7) {
+      return 'Setiap Hari';
+    }
+    return [...days].sort((a: DayType, b: DayType) => 
+      DAYS.indexOf(a) - DAYS.indexOf(b)
+    ).join(', ');
+  };
+
   const handleScheduleToggle = (value: boolean) => {
     setScheduleEnabled(value);
     setManualControl(false);
@@ -104,11 +115,11 @@ const HomeScreen = () => {
       <StatusBar barStyle="light-content" backgroundColor="#16a34a" />
       
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>RoboWater</Text>
-        <TouchableOpacity>
-          <Icon name="cog" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
+  <Text style={styles.headerTitle}>RoboWater</Text>
+  <TouchableOpacity onPress={() => setShowAboutModal(true)}>
+    <Icon name="information" size={24} color="white" />
+  </TouchableOpacity>
+</View>
 
       <View style={styles.content}>
         <View style={styles.card}>
@@ -120,7 +131,7 @@ const HomeScreen = () => {
               </Text>
               {currentSchedule && scheduleEnabled && (
                 <Text style={styles.scheduleInfo}>
-                  Terjadwal: {currentSchedule.days.join(', ')}
+                  Terjadwal: {formatScheduleDays(currentSchedule.days)}
                   {'\n'}
                   {new Date(currentSchedule.startTime).toLocaleTimeString('id-ID', {
                     hour: '2-digit',
@@ -137,12 +148,14 @@ const HomeScreen = () => {
           </View>
         </View>
 
+        {/* Tombol kontrol */}
         <TouchableOpacity
           style={[styles.controlButton, {backgroundColor: isWatering ? '#ef4444' : '#16a34a'}]}
           onPress={handleWateringToggle}>
           <Icon name="power" size={48} color="white" />
         </TouchableOpacity>
 
+        {/* Card jadwal */}
         <View style={styles.card}>
           <View style={styles.scheduleHeader}>
             <View style={styles.scheduleTitle}>
@@ -176,6 +189,10 @@ const HomeScreen = () => {
         onSave={handleScheduleSave}
         currentSchedule={currentSchedule}
       />
+      <AboutModal
+  visible={showAboutModal}
+  onClose={() => setShowAboutModal(false)}
+/>
     </SafeAreaView>
   );
 };

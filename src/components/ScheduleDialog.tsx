@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import {DAYS} from '../constants/days';
+import {DAYS, DayType} from '../constants/days';
 
 interface ScheduleDialogProps {
   visible: boolean;
@@ -21,7 +21,7 @@ interface ScheduleDialogProps {
 export interface ScheduleSettings {
   startTime: Date;
   endTime: Date;
-  days: string[];
+  days: DayType[];
 }
 
 const ScheduleDialog: React.FC<ScheduleDialogProps> = ({
@@ -36,13 +36,13 @@ const ScheduleDialog: React.FC<ScheduleDialogProps> = ({
   const [endTime, setEndTime] = useState<Date>(
     currentSchedule?.endTime || new Date(),
   );
-  const [selectedDays, setSelectedDays] = useState<string[]>(
+  const [selectedDays, setSelectedDays] = useState<DayType[]>(
     currentSchedule?.days || [],
   );
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
   
-    const handleDayToggle = (day: string) => {
+    const handleDayToggle = (day: DayType) => {
       if (selectedDays.includes(day)) {
         setSelectedDays(selectedDays.filter(d => d !== day));
       } else {
